@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Combine Elements</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
+.container { max-width: 900px; margin: 40px auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+h1 { margin-bottom: 20px; }
+input, button { width: 100%; margin-bottom: 15px; }
+#result { margin-top: 20px; display: none; }
+.element-info { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 15px; background-color: #f8f9fa; }
+.compound-name { font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center">Combine Elements</h1>
+
+    <input list="elements-list" id="element1" placeholder="Select or type first element" class="form-control">
+    <input list="elements-list" id="element2" placeholder="Select or type second element" class="form-control">
+
+    <datalist id="elements-list">
+        <option value="Hydrogen (H)">
+        <option value="Helium (He)">
+        <option value="Lithium (Li)">
+        <option value="Beryllium (Be)">
+        <option value="Boron (B)">
+        <option value="Carbon (C)">
+        <option value="Nitrogen (N)">
+        <option value="Oxygen (O)">
+        <option value="Fluorine (F)">
+        <option value="Neon (Ne)">
+        <option value="Sodium (Na)">
+        <option value="Magnesium (Mg)">
+        <option value="Aluminum (Al)">
+        <option value="Silicon (Si)">
+        <option value="Phosphorus (P)">
+        <option value="Sulfur (S)">
+        <option value="Chlorine (Cl)">
+        <option value="Argon (Ar)">
+        <option value="Potassium (K)">
+        <option value="Calcium (Ca)">
+        <!-- Continue with all 118 elements -->
+    </datalist>
+
+    <button onclick="combineElements()" class="btn btn-primary">Combine</button>
+
+    <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+
+    <div id="result">
+        <div class="compound-name" id="compound-name"></div>
+        <div class="row">
+            <div class="col-md-6"><div class="element-info" id="element1-info"></div></div>
+            <div class="col-md-6"><div class="element-info" id="element2-info"></div></div>
+        </div>
+        <div class="element-info" id="compound-info"></div>
+    </div>
+</div>
+
+<script>
+const elementData = {
+    "Hydrogen (H)": {symbol: "H", atomicNumber: 1, description: "Lightest element, highly flammable gas."},
+    "Helium (He)": {symbol: "He", atomicNumber: 2, description: "Inert gas used in balloons and cooling."},
+    "Lithium (Li)": {symbol: "Li", atomicNumber: 3, description: "Soft, silvery metal used in batteries."},
+    "Beryllium (Be)": {symbol: "Be", atomicNumber: 4, description: "Hard, brittle metal used in aerospace."},
+    "Boron (B)": {symbol: "B", atomicNumber: 5, description: "Metalloid, used in glass and detergents."},
+    "Carbon (C)": {symbol: "C", atomicNumber: 6, description: "Basis of organic compounds, forms diamond and graphite."},
+    "Nitrogen (N)": {symbol: "N", atomicNumber: 7, description: "Colorless gas, essential for proteins."},
+    "Oxygen (O)": {symbol: "O", atomicNumber: 8, description: "Essential for respiration and combustion."},
+    "Fluorine (F)": {symbol: "F", atomicNumber: 9, description: "Highly reactive halogen gas."},
+    "Neon (Ne)": {symbol: "Ne", atomicNumber: 10, description: "Inert gas used in neon signs."},
+    "Sodium (Na)": {symbol: "Na", atomicNumber: 11, description: "Soft metal, reacts violently with water."},
+    "Magnesium (Mg)": {symbol: "Mg", atomicNumber: 12, description: "Light metal used in alloys and fireworks."},
+    "Aluminum (Al)": {symbol: "Al", atomicNumber: 13, description: "Lightweight metal used in packaging."},
+    "Silicon (Si)": {symbol: "Si", atomicNumber: 14, description: "Metalloid, used in electronics and glass."},
+    "Phosphorus (P)": {symbol: "P", atomicNumber: 15, description: "Nonmetal, essential for DNA and fertilizers."},
+    "Sulfur (S)": {symbol: "S", atomicNumber: 16, description: "Yellow nonmetal, used in sulfuric acid."},
+    "Chlorine (Cl)": {symbol: "Cl", atomicNumber: 17, description: "Greenish-yellow gas, used in disinfectants."},
+    "Argon (Ar)": {symbol: "Ar", atomicNumber: 18, description: "Inert gas used in lighting and welding."},
+    "Potassium (K)": {symbol: "K", atomicNumber: 19, description: "Soft metal, important for biological functions."},
+    "Calcium (Ca)": {symbol: "Ca", atomicNumber: 20, description: "Alkaline earth metal, important for bones."},
+    // Add all 118 elements here
+};
+
+// Define valid combinations
+const compoundData = {
+    "Hydrogen (H)+Oxygen (O)": "Forms Water (H2O), essential for life.",
+    "Oxygen (O)+Hydrogen (H)": "Forms Water (H2O), essential for life.",
+    "Sodium (Na)+Chlorine (Cl)": "Forms Sodium Chloride (NaCl), commonly known as table salt.",
+    "Chlorine (Cl)+Sodium (Na)": "Forms Sodium Chloride (NaCl), commonly known as table salt."
+    // Add more known compounds here
+};
+
+function combineElements() {
+    const el1 = document.getElementById("element1").value.trim();
+    const el2 = document.getElementById("element2").value.trim();
+    const errorMessage = document.getElementById("error-message");
+    const resultDiv = document.getElementById("result");
+    const compoundName = document.getElementById("compound-name");
+    const el1Info = document.getElementById("element1-info");
+    const el2Info = document.getElementById("element2-info");
+    const compoundInfo = document.getElementById("compound-info");
+
+    if (!el1 || !el2) {
+        errorMessage.textContent = "Please select or type both elements!";
+        errorMessage.classList.remove("d-none");
+        resultDiv.style.display = "none";
+        return;
+    }
+    errorMessage.classList.add("d-none");
+
+    el1Info.innerHTML = elementData[el1]
+        ? `<strong>${el1}</strong><br>Symbol: ${elementData[el1].symbol}<br>Atomic Number: ${elementData[el1].atomicNumber}<br>${elementData[el1].description}`
+        : `No information available for ${el1}`;
+
+    el2Info.innerHTML = elementData[el2]
+        ? `<strong>${el2}</strong><br>Symbol: ${elementData[el2].symbol}<br>Atomic Number: ${elementData[el2].atomicNumber}<br>${elementData[el2].description}`
+        : `No information available for ${el2}`;
+
+    compoundName.textContent = `${el1} + ${el2}`;
+
+    const comboKey = `${el1}+${el2}`;
+    compoundInfo.textContent = compoundData[comboKey]
+        ? compoundData[comboKey]
+        : "No information available for this combination.";
+
+    resultDiv.style.display = "block";
+	<!--  NAVBAR  -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('index') }}">
+      <img src="{{ url_for('static', filename='image/logo.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+      Element Explorer
+    </a>
+    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Home</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'combine_page' %}active{% endif %}" href="{{ url_for('combine_page') }}">Combine</a></li>
+        <li class="nav-item"><a class="nav-link {% if request.endpoint == 'about' %}active{% endif %}" href="{{ url_for('about') }}">About</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
